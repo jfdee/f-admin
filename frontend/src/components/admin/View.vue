@@ -1,14 +1,11 @@
 <template>
-  <div>
-    <NavigationView />
-    111
-  </div>
+  <NavigationView />
 </template>
 
 <script>
   import NavigationView from './NavigationView.vue'
   export default {
-    name: 'MainView',
+    name: 'AdminView',
     components: {NavigationView},
   }
 </script>
