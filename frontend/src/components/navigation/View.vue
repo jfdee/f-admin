@@ -1,10 +1,7 @@
 <template>
-  <el-menu
-    default-active="2"
-    class="el-menu-vertical-demo"
-  >
+  <el-menu default-active="2" class="el-menu-vertical-demo">
     <el-menu-item
-      v-for="(item, index) in menuItems"
+      v-for="(item, index) in items"
       :key="index"
       :index="getValidIndex(index)"
       @click="onSelectItem(item)"
@@ -20,7 +17,7 @@
     name: 'NavigationView',
     mixins: [MenuStoreMixin],
     computed: {
-      menuItems() {
+      items() {
         return this.menuStore.items
       },
     },
