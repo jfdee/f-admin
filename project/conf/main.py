@@ -7,7 +7,16 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
+    # COMMON
     TIMEZONE: str = 'UTC'
+
+    # CORS
+    ALLOW_ORIGINS: list[str] = ['*']
+    ALLOW_CREDENTIALS: bool = True
+    ALLOW_METHODS: list[str] = ['*']
+    ALLOW_HEADERS: list[str] = ['*']
+
+    # APPS
     INSTALLED_APPS: list[str] = [
         'apps.organization',
         'apps.user',
@@ -25,6 +34,9 @@ class Settings(BaseSettings):
     REDIS_HOST: str = 'redis'
     REDIS_PASSWORD: str = ''
     REDIS_DB: int = 0
+
+    # ADMIN
+    ADMIN_EXCLUDE_MODELS: list[str] = ['Aerich']
 
     class Config(BaseSettings.Config):
         env_file: str = '.env'

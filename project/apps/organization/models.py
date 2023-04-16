@@ -8,5 +8,9 @@ class Organization(models.Model):
     address = fields.CharField(description='Адрес', max_length=128)
     email = fields.CharField(description='Почта', max_length=128)
 
+    class Meta:
+        verbose_name: str = 'Организация'
+        verbose_name_plural: str = 'Организации'
+
 
 __all__ = ('Organization', )

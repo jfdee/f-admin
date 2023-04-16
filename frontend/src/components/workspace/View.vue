@@ -1,13 +1,13 @@
 <template>
   <el-container>
     <el-header>
-      {{ modelMeta.label }}
+      {{ selectedItem.label }}
     </el-header>
     <el-main>
       <el-button style="width: 100%" @click="onAdd">Add</el-button>
-      <el-table class="mt-4" :data="tableData" border>
+      <el-table class="mt-4" :data="data" border>
         <el-table-column
-          v-for="field in modelMeta.fields"
+          v-for="field in meta"
           :key="field.name"
           :prop="field.name"
           :label="field.label"
@@ -22,26 +22,21 @@
   export default {
     name: 'MenuItemView',
     mixins: [MenuStoreMixin],
+    data() {
+      return {
+        data: [],
+        meta: [],
+      }
+    },
     computed: {
-      modelMeta() {
+      selectedItem() {
         return this.menuStore.selected
       },
-      tableData() {
-        return [
-          {
-            'field1': 'f_value1.1',
-            'field2': 'f_value1.2',
-            'field3': 'f_value1.3',
-            'field4': 'f_value1.4',
-          },
-          {
-            'field1': 'f_value2.1',
-            'field2': 'f_value2.2',
-            'field3': 'f_value2.3',
-            'field4': 'f_value2.4',
-          },
-        ]
-      },
+    },
+    async mounted() {
+      const {data} = await this.$ajax.get(`/api/admin/items/${this.selectedItem.code}`)
+      this.data = data.data
+      this.meta = data.meta
     },
     methods: {
       onAdd() {
