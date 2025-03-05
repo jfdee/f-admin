@@ -14,18 +14,22 @@
         />
       </el-table>
     </el-main>
+    <CreateForm :show="showCreateForm" :fields="meta" @close="showCreateForm=false" @submit="onSubmit" />
   </el-container>
 </template>
 
 <script>
   import MenuStoreMixin from '/components/MenuStoreMixin'
+  import CreateForm from './CreateForm.vue'
   export default {
     name: 'MenuItemView',
+    components: {CreateForm},
     mixins: [MenuStoreMixin],
     data() {
       return {
         data: [],
         meta: [],
+        showCreateForm: false,
       }
     },
     computed: {
@@ -33,14 +37,19 @@
         return this.menuStore.selected
       },
     },
-    async mounted() {
-      const {data} = await this.$ajax.get(`/api/admin/items/${this.selectedItem.code}`)
-      this.data = data.data
-      this.meta = data.meta
+    mounted() {
+      this.$ajax.get(`/api/admin/items/${this.selectedItem.code}`).then(({data}) => {
+        this.data = data.data
+        this.meta = data.meta
+      })
     },
     methods: {
       onAdd() {
-        console.log('add')
+        this.showCreateForm = true
+      },
+      onSubmit(data) {
+        this.showCreateForm = false
+        console.log(data)
       },
     },
   }

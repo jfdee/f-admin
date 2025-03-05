@@ -9,7 +9,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   root: 'src',
   server: {
-    host: '127.0.0.1',
+    host: 'localhost',
     port: 3000,
     proxy: {
       '/api': {

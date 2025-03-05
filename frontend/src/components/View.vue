@@ -16,9 +16,10 @@
     name: 'AdminView',
     components: {NavigationView},
     mixins: [MenuStoreMixin],
-    async mounted() {
-      const {data} = await this.$ajax.get('/api/admin/items')
-      this.menuStore.items = data
+    mounted() {
+      this.$ajax.get('/api/admin/items/').then(({data}) => {
+        this.menuStore.items = data
+      }).catch(e => console.log(e))
     },
   }
 </script>
