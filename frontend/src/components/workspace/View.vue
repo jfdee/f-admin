@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-header>
-      {{ selectedItem.label }}
+      {{ selectedItem?.label }}
     </el-header>
     <el-main>
       <el-button style="width: 100%" @click="onAdd">Add</el-button>
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import MenuStoreMixin from '/components/MenuStoreMixin'
+  import MenuStoreMixin from '@/components/MenuStoreMixin'
   import CreateForm from './CreateForm.vue'
   export default {
     name: 'MenuItemView',
@@ -34,10 +34,16 @@
     },
     computed: {
       selectedItem() {
-        return this.menuStore.selected
+        return this.menuStore.getSelectedItem
       },
     },
-    mounted() {
+    async created() {
+      if (!this.menuStore.selected) {
+        // page reload
+        await this.menuStore.init()
+        const code = this.$router.currentRoute.value.params.code
+        this.menuStore.setSelected(code)
+      }
       this.$ajax.get(`/api/admin/items/${this.selectedItem.code}`).then(({data}) => {
         this.data = data.data
         this.meta = data.meta

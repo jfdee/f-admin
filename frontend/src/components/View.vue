@@ -10,16 +10,14 @@
 </template>
 
 <script>
-  import MenuStoreMixin from '/components/MenuStoreMixin'
+  import MenuStoreMixin from '@/components/MenuStoreMixin'
   import NavigationView from './navigation/View.vue'
   export default {
     name: 'AdminView',
     components: {NavigationView},
     mixins: [MenuStoreMixin],
-    mounted() {
-      this.$ajax.get('/api/admin/items/').then(({data}) => {
-        this.menuStore.items = data
-      }).catch(e => console.log(e))
+    created() {
+      this.menuStore.init()
     },
   }
 </script>

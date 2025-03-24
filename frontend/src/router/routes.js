@@ -1,4 +1,4 @@
-import adminRoutes from '/components/routes'
+import adminRoutes from '@/components/routes'
 export default [
   {
     path: '/',

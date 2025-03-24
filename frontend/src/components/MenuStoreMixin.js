@@ -1,4 +1,4 @@
-import {menuStore} from '/stores/menu'
+import {menuStore} from '@/stores/menu'
 const _store = menuStore()
 export default {
   computed: {
