@@ -11,7 +11,7 @@ export const menuStore = defineStore('menu', {
   },
   actions: {
     async init() {
-      const {data} = await axios.get('/api/admin/items')
+      const {data} = await axios.get('/api/admin/menu/')
       this.items = data
     },
     setSelected(code) {

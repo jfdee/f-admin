@@ -15,7 +15,7 @@
 
 <script>
   export default {
-    name: 'CreateForm',
+    name: 'EditForm',
     props: {
       show: {
         type: Boolean,
@@ -25,21 +25,28 @@
         type: Array,
         required: true,
       },
+      row: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
         item: {},
       }
     },
+    watch: {
+      row(val) {
+        if (!val) return
+        this.writeFields.forEach(field => {
+          this.item[field.name] = this.row[field.name]
+        })
+      }
+    },
     computed: {
       writeFields() {
         return this.fields.filter(item => !item.read_only)
       },
-    },
-    mounted() {
-      this.writeFields.forEach(item => {
-        this.item[item.name] = null
-      })
     },
     methods: {
       onSubmit() {
