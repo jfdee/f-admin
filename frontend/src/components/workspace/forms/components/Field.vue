@@ -1,5 +1,5 @@
 <template>
-  <component :is="component" />
+  <component :is="component" :meta="meta" />
 </template>
 
 <script>
@@ -8,6 +8,7 @@
   import DateTimeField from "./DateTimeField.vue";
   import TextField from "./TextField.vue";
   import NumberField from "./NumberField.vue";
+  import SelectField from "./SelectField.vue";
   export default {
     name: 'FieldView',
     props: {
@@ -32,6 +33,8 @@
             return DateField
           case 'datetime':
             return DateTimeField
+          case 'foreign_key':
+            return SelectField
           default:
             return TextField
         }

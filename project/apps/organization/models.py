@@ -12,5 +12,8 @@ class Organization(models.Model):
         verbose_name: str = 'Организация'
         verbose_name_plural: str = 'Организации'
 
+    def __str__(self):
+        return f'{self.short_name}'
+
 
 __all__ = ('Organization', )

@@ -25,6 +25,9 @@ class User(models.Model):
         verbose_name: str = 'Пользователь'
         verbose_name_plural: str = 'Пользователи'
 
+    def __str__(self):
+        return f'{self.last_name} {self.first_name}'
+
 
 UserPydantic = pydantic_model_creator(User)
 

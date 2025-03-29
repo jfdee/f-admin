@@ -40,24 +40,31 @@ DATE_FORMAT: str = '%d.%m.%Y'
 DATETIME_FORMAT: str = '%d.%m.%Y %H:%S'
 
 
-def to_representation(fields: list, queryset) -> list:
+async def to_representation(fields: list, queryset) -> list:
     """object -> json"""
     items = []
     for obj in queryset:
         item = {}
         for field in fields:
-            value = getattr(obj, field['name'])
-            if value and field['type'] == 'datetime':
+            f_type = field['type']
+            if f_type == 'foreign_key':
+                value = await getattr(obj, field['name'])
+            else:
+                value = getattr(obj, field['name'])
+            if value and f_type == 'datetime':
                 value = value.strftime(DATETIME_FORMAT)
-            if value and field['type'] == 'date':
+            if value and f_type == 'date':
                 value = value.strftime(DATE_FORMAT)
+            if value and f_type == 'foreign_key':
+                value = str(value)
             item[field['name']] = value
         items.append(item)
     return items
 
 
-def to_internal_value(model, data: dict):
+async def to_internal_value(model, data: dict):
     """json -> object"""
+    _data = {}
     for key, value in data.items():
         f_meta = model._meta.fields_map[key]
         f_type = f_meta.field_type.__name__
@@ -69,45 +76,53 @@ def to_internal_value(model, data: dict):
             value = f_meta.default
         if f_type == 'int':
             value = f_meta.default if not value else int(value)
-        data[key] = value
+        if getattr(f_meta, 'related_model', None):
+            key = f'{key}_id'
+        _data[key] = value
+    return _data
 
 
-def get_fields_meta(model) -> list:
+async def get_fields_meta(model) -> list:
     fields = []
     for f_name, f_meta in model._meta.fields_map.items():
-        if getattr(f_meta, 'related_model', None):
-            # fk
+        if not f_meta.field_type:
+            # backward relation
             continue
-        # if f_meta.allows_generated:
+        field_meta = {
+            'name': f_name,
+            'label': f_meta.description or f_name,
+            'required': f_meta.required,
+            'allow_null': f_meta.null,
+            'type': f_meta.field_type.__name__,
+        }
+        if getattr(f_meta, 'related_model', None):
+            related_queryset = await f_meta.related_model.all()
+            field_meta['type'] = 'foreign_key'
+            field_meta['choices'] = [(x.id, str(x)) for x in related_queryset]
+        if f_meta.allows_generated and f_meta.source_field:
             # fk _id
-            # continue
+            continue
         read_only = any([
             f_meta.generated,
             getattr(f_meta, 'auto_now_add', False),
             getattr(f_meta, 'auto_now', False),
         ])
-        fields.append({
-            'name': f_name,
-            'label': f_meta.description or f_name,
-            'read_only': read_only,
-            'required': f_meta.required,
-            'allow_null': f_meta.null,
-            'type': f_meta.field_type.__name__,
-        })
+        field_meta['read_only'] = read_only
+        fields.append(field_meta)
     return fields
 
 
 async def menu_item_list(code: str):
     model = _get_model(code)
     queryset = await model.all().order_by('-created_at')
-    fields_meta = get_fields_meta(model)
-    items = to_representation(fields=fields_meta, queryset=queryset)
+    fields_meta = await get_fields_meta(model)
+    items = await to_representation(fields=fields_meta, queryset=queryset)
     return {'data': items, 'meta': fields_meta}
 
 
 async def menu_item_post(code: str, data: dict):
     model = _get_model(code)
-    to_internal_value(model=model, data=data)
+    data = await to_internal_value(model=model, data=data)
     instance = await model.create(**data)
     return {'pk': instance.pk}
 
@@ -119,7 +134,7 @@ async def menu_item_instance_retrieve(code: str, pk: int):
 
 async def menu_item_instance_put(code: str, pk: int, data: dict):
     model = _get_model(code)
-    to_internal_value(model=model, data=data)
+    data = await to_internal_value(model=model, data=data)
     instance = await _get_model_instance(code, pk)
     for key, value in data.items():
         setattr(instance, key, value)
