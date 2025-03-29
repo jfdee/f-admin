@@ -1,11 +1,11 @@
 <template>
-  <el-container>
+  <el-container v-if="selectedItem">
     <el-header>
-      {{ selectedItem?.label }}
+      {{ selectedItem.label }}
     </el-header>
     <el-main>
       <el-row justify="end" style="margin-bottom: 12px">
-        <el-button style="width: 130px" title="Create" icon="plus" @click="onAdd" />
+        <el-button style="width: 130px" title="Create" icon="plus" @click="onCreate" />
       </el-row>
       <el-table :data="data" border table-layout="auto">
         <el-table-column
@@ -22,7 +22,7 @@
         </el-table-column>
       </el-table>
     </el-main>
-    <CreateForm :show="showCreateForm" :fields="meta" @close="showCreateForm=false" @submit="onSubmitCreate" />
+    <CreateForm :show="showCreateForm" :fields="meta" @close="onCreateClose" @submit="onSubmitCreate" />
     <EditForm :show="showEditForm" :fields="meta" :row="selectedRow" @close="onEditClose" @submit="onSubmitEdit" />
   </el-container>
 </template>
@@ -70,8 +70,11 @@
           this.meta = data.meta
         })
       },
-      onAdd() {
+      onCreate() {
         this.showCreateForm = true
+      },
+      onCreateClose() {
+        this.showCreateForm = false
       },
       onSubmitCreate(data) {
         this.$ajax.post(`/api/admin/menu/${this.selectedItem.code}/`, data).then(() => {
@@ -80,6 +83,14 @@
         }).catch(e => {
           console.log(e)
         })
+      },
+      onEdit(row) {
+        this.selectedRow = row
+        this.showEditForm = true
+      },
+      onEditClose() {
+        this.selectedRow = null
+        this.showEditForm = false
       },
       onSubmitEdit(data) {
         this.$ajax.put(`/api/admin/menu/${this.selectedItem.code}/${this.selectedRow.id}/`, data).then(() => {
@@ -95,14 +106,6 @@
         }).catch(e => {
           console.log(e)
         })
-      },
-      onEdit(row) {
-        this.selectedRow = row
-        this.showEditForm = true
-      },
-      onEditClose() {
-        this.selectedRow = null
-        this.showEditForm = false
       },
     },
   }

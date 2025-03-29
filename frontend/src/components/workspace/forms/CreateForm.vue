@@ -46,7 +46,7 @@
     methods: {
       onSubmit() {
         this.$emit('submit', this.item)
-        // this.item = {}
+        this.item = {}
       },
     },
   }

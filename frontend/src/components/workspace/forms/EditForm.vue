@@ -1,5 +1,5 @@
 <template>
-  <el-dialog center :model-value="show">
+  <el-dialog style="padding-top: 24px" center :model-value="show">
     <el-form :model="item" label-position="left" label-width="auto">
       <el-form-item v-for="field in writeFields" :key="field.name" :label="field.label">
         <Field v-model="item[field.name]" :meta="field"/>
@@ -53,7 +53,7 @@
     methods: {
       onSubmit() {
         this.$emit('submit', this.item)
-        // this.item = {}
+        this.item = {}
       },
     },
   }
