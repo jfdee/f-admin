@@ -1,0 +1,41 @@
+<template>
+  <component :is="component" />
+</template>
+
+<script>
+  import BoolField from "./BoolField.vue";
+  import DateField from "./DateField.vue";
+  import DateTimeField from "./DateTimeField.vue";
+  import TextField from "./TextField.vue";
+  import NumberField from "./NumberField.vue";
+  export default {
+    name: 'FieldView',
+    props: {
+      meta: {
+        type: Object,
+        required: true,
+      },
+    },
+    data() {
+      return {
+        value: null,
+      }
+    },
+    computed: {
+      component() {
+        switch (this.meta.type) {
+          case 'bool':
+            return BoolField
+          case 'int':
+            return NumberField
+          case 'date':
+            return DateField
+          case 'datetime':
+            return DateTimeField
+          default:
+            return TextField
+        }
+      },
+    },
+  }
+</script>

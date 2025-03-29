@@ -4,24 +4,22 @@
       {{ selectedItem?.label }}
     </el-header>
     <el-main>
-      <el-button style="width: 100%" @click="onAdd">+</el-button>
-      <el-table class="mt-4" :data="data" border>
-        <el-table-column label="edit">
-          <template #default="{row}">
-            <el-button @click="onEdit(row)">x</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="delete">
-          <template #default="{row}">
-            <el-button @click="onDelete(row)">-</el-button>
-          </template>
-        </el-table-column>
+      <el-row justify="end" style="margin-bottom: 12px">
+        <el-button style="width: 130px" title="Create" icon="plus" @click="onAdd" />
+      </el-row>
+      <el-table :data="data" border table-layout="auto">
         <el-table-column
           v-for="field in meta"
           :key="field.name"
           :prop="field.name"
           :label="field.label"
         />
+        <el-table-column width="130">
+          <template #default="{row}">
+            <el-button title="Edit" icon="edit" @click="onEdit(row)" />
+            <el-button title="Delete" icon="delete" @click="onDelete(row)" />
+          </template>
+        </el-table-column>
       </el-table>
     </el-main>
     <CreateForm :show="showCreateForm" :fields="meta" @close="showCreateForm=false" @submit="onSubmitCreate" />
@@ -31,8 +29,8 @@
 
 <script>
   import MenuStoreMixin from '@/components/MenuStoreMixin'
-  import CreateForm from './CreateForm.vue'
-  import EditForm from './EditForm.vue'
+  import CreateForm from './forms/CreateForm.vue'
+  import EditForm from './forms/EditForm.vue'
   export default {
     name: 'MenuItemView',
     components: {CreateForm, EditForm},
@@ -63,6 +61,7 @@
         const code = this.$router.currentRoute.value.params.code
         this.menuStore.setSelected(code)
       }
+      this.load()
     },
     methods: {
       load() {
@@ -78,17 +77,23 @@
         this.$ajax.post(`/api/admin/menu/${this.selectedItem.code}/`, data).then(() => {
           this.load()
           this.showCreateForm = false
+        }).catch(e => {
+          console.log(e)
         })
       },
       onSubmitEdit(data) {
         this.$ajax.put(`/api/admin/menu/${this.selectedItem.code}/${this.selectedRow.id}/`, data).then(() => {
           this.load()
           this.onEditClose()
+        }).catch(e => {
+          console.log(e)
         })
       },
       onDelete(row) {
         this.$ajax.delete(`/api/admin/menu/${this.selectedItem.code}/${row.id}/`).then(() => {
           this.load()
+        }).catch(e => {
+          console.log(e)
         })
       },
       onEdit(row) {

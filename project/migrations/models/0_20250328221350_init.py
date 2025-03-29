@@ -27,12 +27,20 @@ CREATE TABLE IF NOT EXISTS "user" (
     "created_at" TIMESTAMPTZ NOT NULL  DEFAULT CURRENT_TIMESTAMP,
     "username" VARCHAR(128) NOT NULL,
     "email" VARCHAR(128) NOT NULL,
-    "full_name" VARCHAR(256) NOT NULL
+    "last_name" VARCHAR(256) NOT NULL,
+    "first_name" VARCHAR(256) NOT NULL,
+    "patronymic" VARCHAR(256),
+    "is_blocked" BOOL NOT NULL  DEFAULT False,
+    "organization_id" INT REFERENCES "organization" ("id") ON DELETE SET NULL
 );
 COMMENT ON COLUMN "user"."created_at" IS 'Дата создания';
 COMMENT ON COLUMN "user"."username" IS 'Логин';
 COMMENT ON COLUMN "user"."email" IS 'Почта';
-COMMENT ON COLUMN "user"."full_name" IS 'ФИО';"""
+COMMENT ON COLUMN "user"."last_name" IS 'Фамилия';
+COMMENT ON COLUMN "user"."first_name" IS 'Имя';
+COMMENT ON COLUMN "user"."patronymic" IS 'Отчество';
+COMMENT ON COLUMN "user"."is_blocked" IS 'Заблокирован';
+COMMENT ON COLUMN "user"."organization_id" IS 'Организация';"""
 
 
 async def downgrade(db: BaseDBAsyncClient) -> str:

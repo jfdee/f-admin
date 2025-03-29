@@ -6,7 +6,20 @@ class User(models.Model):
     created_at = fields.DatetimeField(description='Дата создания', auto_now_add=True)
     username = fields.CharField(description='Логин', max_length=128)
     email = fields.CharField(description='Почта', max_length=128)
-    full_name = fields.CharField(description='ФИО', max_length=256)
+    last_name = fields.CharField(description='Фамилия', max_length=256)
+    first_name = fields.CharField(description='Имя', max_length=256)
+    patronymic = fields.CharField(description='Отчество', max_length=256, null=True)
+    is_blocked = fields.BooleanField(description='Заблокирован', default=False)
+    organization = fields.ForeignKeyField(
+        model_name='models.Organization',
+        description='Организация',
+        related_name='users',
+        on_delete=fields.SET_NULL,
+        null=True,
+    )
+    register_at = fields.DateField(description='Дата регистрации', null=True)
+    blocked_at = fields.DatetimeField(description='Дата и время блокировки', null=True)
+    number = fields.IntField(description='Номер', null=True)
 
     class Meta:
         verbose_name: str = 'Пользователь'

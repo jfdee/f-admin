@@ -6,7 +6,7 @@
       :index="getValidIndex(index)"
       @click="onSelectItem(item)"
     >
-      <el-icon><House /></el-icon>
+      <el-icon><DataAnalysis /></el-icon>
       <span>{{ item.label }}</span>
     </el-menu-item>
   </el-menu>
