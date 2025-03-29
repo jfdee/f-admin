@@ -1,7 +1,7 @@
 <template>
-  <el-dialog style="padding-top: 24px" center :model-value="show">
-    <el-form :model="item" label-position="left" label-width="auto">
-      <el-form-item v-for="field in writeFields" :key="field.name" :label="field.label">
+  <el-dialog style="padding-top: 24px" center :model-value="show" @close="onClose">
+    <el-form ref="form" :model="item" :rules="rules" label-position="left" label-width="auto">
+      <el-form-item v-for="field in writeFields" :key="field.name" :label="field.label" :prop="field.name">
         <Field v-model="item[field.name]" :meta="field"/>
       </el-form-item>
     </el-form>
@@ -37,6 +37,13 @@
       writeFields() {
         return this.fields.filter(item => !item.read_only)
       },
+      rules() {
+        let rules = {}
+        this.writeFields.forEach(item => {
+          rules[item.name] = [{required: item.required, message: 'Value required', trigger: 'blur'}]
+        })
+        return rules
+      },
     },
     mounted() {
       this.writeFields.forEach(item => {
@@ -45,9 +52,15 @@
     },
     methods: {
       onSubmit() {
-        this.$emit('submit', this.item)
-        this.item = {}
+        this.$refs.form.validate((valid) => {
+          if (!valid) return
+          this.$emit('submit', this.item)
+          this.item = {}
+        })
       },
+      onClose() {
+        this.$refs.form.resetFields()
+      }
     },
   }
 </script>

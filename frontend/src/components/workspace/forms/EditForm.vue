@@ -1,23 +1,12 @@
 <template>
-  <el-dialog style="padding-top: 24px" center :model-value="show">
-    <el-form :model="item" label-position="left" label-width="auto">
-      <el-form-item v-for="field in writeFields" :key="field.name" :label="field.label">
-        <Field v-model="item[field.name]" :meta="field"/>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-row justify="end">
-        <el-button @click="onSubmit">Submit</el-button>
-      </el-row>
-    </template>
-  </el-dialog>
+  <CreateForm ref="form" :show="show" :fields="fields"/>
 </template>
 
 <script>
-  import Field from './components/Field.vue'
+  import CreateForm from "./CreateForm.vue";
   export default {
     name: 'EditForm',
-    components: {Field},
+    components: {CreateForm},
     props: {
       show: {
         type: Boolean,
@@ -32,29 +21,13 @@
         default: null,
       },
     },
-    data() {
-      return {
-        item: {},
-      }
-    },
     watch: {
       row(val) {
         if (!val) return
-        this.writeFields.forEach(field => {
-          this.item[field.name] = this.row[field.name]
+        this.$refs.form.writeFields.forEach(field => {
+          this.$refs.form.item[field.name] = this.row[field.name]
         })
       }
-    },
-    computed: {
-      writeFields() {
-        return this.fields.filter(item => !item.read_only)
-      },
-    },
-    methods: {
-      onSubmit() {
-        this.$emit('submit', this.item)
-        this.item = {}
-      },
     },
   }
 </script>

@@ -66,6 +66,9 @@ async def to_internal_value(model, data: dict):
     """json -> object"""
     _data = {}
     for key, value in data.items():
+        if not value:
+            _data[key] = value
+            continue
         f_meta = model._meta.fields_map[key]
         f_type = f_meta.field_type.__name__
         if f_type == 'datetime':
