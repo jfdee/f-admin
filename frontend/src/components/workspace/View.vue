@@ -1,29 +1,32 @@
 <template>
   <el-container v-if="selectedItem">
-    <el-header>
+    <el-header height="fit-content">
       {{ selectedItem.label }}
     </el-header>
     <el-main>
-      <el-row justify="end" style="margin-bottom: 12px">
+      <el-row justify="space-between" style="margin-bottom: 12px; width: 100%">
+        <el-pagination layout="prev, pager, next" background :total="count" @current-change="onChangePage" />
         <el-button style="width: 130px" title="Create" icon="plus" @click="onCreate" />
       </el-row>
-      <el-table :data="data" border table-layout="auto">
-        <el-table-column
-          v-for="field in meta"
-          :key="field.name"
-          :prop="field.name"
-          :label="field.label"
-        />
+      <el-table :data="data" max-height="700" table-layout="auto" border flexible>
         <el-table-column width="130">
           <template #default="{row}">
             <el-button title="Edit" icon="edit" @click="onEdit(row)" />
             <el-button title="Delete" icon="delete" @click="onDelete(row)" />
           </template>
         </el-table-column>
+        <el-table-column
+          v-for="field in fields"
+          :key="field.name"
+          :prop="field.name"
+          :label="field.label"
+          show-overflow-tooltip
+          min-width="130"
+        />
       </el-table>
     </el-main>
-    <CreateForm :show="showCreateForm" :fields="meta" @close="onCreateClose" @submit="onSubmitCreate" />
-    <EditForm :show="showEditForm" :fields="meta" :row="selectedRow" @close="onEditClose" @submit="onSubmitEdit" />
+    <CreateForm :show="showCreateForm" :fields="fields" @close="onCreateClose" @submit="onSubmitCreate" />
+    <EditForm :show="showEditForm" :fields="fields" :row="selectedRow" @close="onEditClose" @submit="onSubmitEdit" />
   </el-container>
 </template>
 
@@ -38,10 +41,12 @@
     data() {
       return {
         data: [],
-        meta: [],
+        fields: [],
         selectedRow: null,
         showCreateForm: false,
         showEditForm: false,
+        page: 1,
+        count: 0,
       }
     },
     computed: {
@@ -50,13 +55,15 @@
       },
     },
     watch: {
-      selectedItem() {
+      selectedItem(val, oldVal) {
+        this.page = 1
+        if (oldVal === undefined) return
         this.load()
       },
     },
     async created() {
       if (!this.menuStore.selected) {
-        // page reload
+        // page reload12
         await this.menuStore.init()
         const code = this.$router.currentRoute.value.params.code
         this.menuStore.setSelected(code)
@@ -65,9 +72,11 @@
     },
     methods: {
       load() {
-        this.$ajax.get(`/api/admin/menu/${this.selectedItem.code}/`).then(({data}) => {
+        const params = {page: this.page}
+        this.$ajax.get(`/api/admin/menu/${this.selectedItem.code}/`, {params}).then(({data}) => {
           this.data = data.data
-          this.meta = data.meta
+          this.fields = data.meta.fields
+          this.count = data.meta.paginator.count
         })
       },
       onCreate() {
@@ -78,8 +87,9 @@
       },
       onSubmitCreate(data) {
         this.$ajax.post(`/api/admin/menu/${this.selectedItem.code}/`, data).then(() => {
-          this.load()
           this.showCreateForm = false
+          this.page = 1
+          this.load()
         }).catch(e => {
           console.log(e)
         })
@@ -106,6 +116,10 @@
         }).catch(e => {
           console.log(e)
         })
+      },
+      onChangePage(page) {
+        this.page = page
+        this.load()
       },
     },
   }

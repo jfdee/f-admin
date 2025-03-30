@@ -20,6 +20,7 @@ class User(models.Model):
     register_at = fields.DateField(description='Дата регистрации', null=True)
     blocked_at = fields.DatetimeField(description='Дата и время блокировки', null=True)
     number = fields.IntField(description='Номер', null=True)
+    note = fields.TextField(description='Примечание', null=True)
 
     class Meta:
         verbose_name: str = 'Пользователь'

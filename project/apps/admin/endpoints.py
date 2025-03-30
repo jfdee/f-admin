@@ -115,12 +115,19 @@ async def get_fields_meta(model) -> list:
     return fields
 
 
-async def menu_item_list(code: str):
+async def get_paginator(model):
+    return {'count': await model.all().count()}
+
+
+async def menu_item_list(code: str, page: int):
     model = _get_model(code)
-    queryset = await model.all().order_by('-created_at')
+    limit = 10
+    offset = (page - 1) * limit
+    queryset = await model.all().order_by('-created_at').limit(limit).offset(offset)
     fields_meta = await get_fields_meta(model)
     items = await to_representation(fields=fields_meta, queryset=queryset)
-    return {'data': items, 'meta': fields_meta}
+    paginator = await get_paginator(model)
+    return {'data': items, 'meta': {'fields': fields_meta, 'paginator': paginator}}
 
 
 async def menu_item_post(code: str, data: dict):
