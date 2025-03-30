@@ -112,10 +112,8 @@ export default {
     onEditClose() {
       this.selectedRow = null
       this.showEditForm = false
-      console.log('onEditClose')
     },
     onEditSuccess() {
-      console.log('onEditSuccess')
       this.onEditClose()
       this.load()
     },

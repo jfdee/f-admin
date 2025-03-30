@@ -29,7 +29,6 @@
       }
     },
     created() {
-      console.log('12312')
       this.show = true
     },
     async mounted() {
