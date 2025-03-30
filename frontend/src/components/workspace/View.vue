@@ -28,8 +28,8 @@
         />
       </el-table>
     </el-main>
-    <CreateForm :show="showCreateForm" :fields="fields" @close="onCreateClose" @submit="onSubmitCreate" />
-    <EditForm :show="showEditForm" :fields="fields" :row="selectedRow" @close="onEditClose" @submit="onSubmitEdit" />
+    <CreateForm v-if="showCreateForm" :api-path="apiPath" @close="onCreateClose" @submit-success="onCreateSuccess" />
+    <EditForm v-if="showEditForm" :api-path="apiPath" :row="selectedRow" @close="onEditClose" @submit-success-edit="onEditSuccess" />
   </el-container>
 </template>
 
@@ -61,6 +61,9 @@ export default {
     selectedItem() {
       return this.menuStore.getSelectedItem
     },
+    apiPath() {
+      return `/api/admin/menu/${this.selectedItem.code}/`
+    },
   },
   watch: {
     selectedItem(val, oldVal) {
@@ -83,7 +86,7 @@ export default {
       const params = {page: this.page}
       if (this.search) params.search = this.search
       this.isTableLoaded = false
-      this.$ajax.get(`/api/admin/menu/${this.selectedItem.code}/`, {params}).then(({data}) => {
+      this.$ajax.get(this.apiPath, {params}).then(({data}) => {
         this.data = data.data
         this.fields = data.meta.fields
         this.count = data.meta.paginator.count
@@ -97,14 +100,10 @@ export default {
     onCreateClose() {
       this.showCreateForm = false
     },
-    onSubmitCreate(data) {
-      this.$ajax.post(`/api/admin/menu/${this.selectedItem.code}/`, data).then(() => {
-        this.showCreateForm = false
-        this.page = 1
-        this.load()
-      }).catch(e => {
-        console.log(e)
-      })
+    onCreateSuccess() {
+      this.showCreateForm = false
+      this.page = 1
+      this.load()
     },
     onEdit(row) {
       this.selectedRow = row
@@ -113,17 +112,15 @@ export default {
     onEditClose() {
       this.selectedRow = null
       this.showEditForm = false
+      console.log('onEditClose')
     },
-    onSubmitEdit(data) {
-      this.$ajax.put(`/api/admin/menu/${this.selectedItem.code}/${this.selectedRow.id}/`, data).then(() => {
-        this.load()
-        this.onEditClose()
-      }).catch(e => {
-        console.log(e)
-      })
+    onEditSuccess() {
+      console.log('onEditSuccess')
+      this.onEditClose()
+      this.load()
     },
     onDelete(row) {
-      this.$ajax.delete(`/api/admin/menu/${this.selectedItem.code}/${row.id}/`).then(() => {
+      this.$ajax.delete(`${this.apiPath}${row.id}/`).then(() => {
         this.load()
       }).catch(e => {
         console.log(e)

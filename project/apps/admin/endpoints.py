@@ -40,6 +40,10 @@ DATE_FORMAT: str = '%d.%m.%Y'
 DATETIME_FORMAT: str = '%d.%m.%Y %H:%S'
 
 
+async def get_paginator(model):
+    return {'count': await model.all().count()}
+
+
 async def to_representation(fields: list, queryset) -> list:
     """object -> json"""
     items = []
@@ -47,16 +51,15 @@ async def to_representation(fields: list, queryset) -> list:
         item = {}
         for field in fields:
             f_type = field['type']
-            if f_type == 'foreign_key':
+            if f_type == 'related':
                 value = await getattr(obj, field['name'])
+                value = str(value) if value else None
             else:
                 value = getattr(obj, field['name'])
             if value and f_type == 'datetime':
                 value = value.strftime(DATETIME_FORMAT)
             if value and f_type == 'date':
                 value = value.strftime(DATE_FORMAT)
-            if value and f_type == 'foreign_key':
-                value = str(value)
             item[field['name']] = value
         items.append(item)
     return items
@@ -83,12 +86,52 @@ async def to_internal_value(model, data: dict):
     return _data
 
 
-async def get_fields_meta(model) -> list:
-    # TODO(получать мету при открытыи модалки создания/редактирования)
+async def get_list_meta_fields(model):
     fields = []
     for f_name, f_meta in model._meta.fields_map.items():
         if not f_meta.field_type:
             # backward relation
+            continue
+        if f_meta.allows_generated and f_meta.source_field:
+            # fk field_id
+            continue
+        field_meta = {
+            'name': f_name,
+            'label': f_meta.description or f_name,
+            'type': f_meta.field_type.__name__,
+        }
+        if getattr(f_meta, 'related_model', None):
+            field_meta['type'] = 'related'
+        fields.append(field_meta)
+    return fields
+
+
+async def menu_item_list(code: str, page: int, search: str = None):
+    model = _get_model(code)
+    limit = 10
+    offset = (page - 1) * limit
+    queryset = await model.all().order_by('-created_at').limit(limit).offset(offset)
+    fields_meta = await get_list_meta_fields(model)
+    items = await to_representation(fields=fields_meta, queryset=queryset)
+    paginator = await get_paginator(model)
+    return {'data': items, 'meta': {'fields': fields_meta, 'paginator': paginator}}
+
+
+async def get_object_meta_fields(model):
+    fields = []
+    for f_name, f_meta in model._meta.fields_map.items():
+        if not f_meta.field_type:
+            # backward relation
+            continue
+        if f_meta.allows_generated and f_meta.source_field:
+            # fk field_id
+            continue
+        read_only = any([
+            f_meta.generated,
+            getattr(f_meta, 'auto_now_add', False),
+            getattr(f_meta, 'auto_now', False),
+        ])
+        if read_only:
             continue
         field_meta = {
             'name': f_name,
@@ -99,34 +142,16 @@ async def get_fields_meta(model) -> list:
         }
         if getattr(f_meta, 'related_model', None):
             related_queryset = await f_meta.related_model.all()
-            field_meta['type'] = 'foreign_key'
+            field_meta['type'] = 'select'
             field_meta['choices'] = [(x.id, str(x)) for x in related_queryset]
-        if f_meta.allows_generated and f_meta.source_field:
-            # fk _id
-            continue
-        read_only = any([
-            f_meta.generated,
-            getattr(f_meta, 'auto_now_add', False),
-            getattr(f_meta, 'auto_now', False),
-        ])
-        field_meta['read_only'] = read_only
         fields.append(field_meta)
     return fields
 
 
-async def get_paginator(model):
-    return {'count': await model.all().count()}
-
-
-async def menu_item_list(code: str, page: int, search: str = None):
+async def menu_item_meta(code: str):
     model = _get_model(code)
-    limit = 10
-    offset = (page - 1) * limit
-    queryset = await model.all().order_by('-created_at').limit(limit).offset(offset)
-    fields_meta = await get_fields_meta(model)
-    items = await to_representation(fields=fields_meta, queryset=queryset)
-    paginator = await get_paginator(model)
-    return {'data': items, 'meta': {'fields': fields_meta, 'paginator': paginator}}
+    fields = await get_object_meta_fields(model)
+    return {'fields': fields}
 
 
 async def menu_item_post(code: str, data: dict):
@@ -159,6 +184,7 @@ async def menu_item_instance_delete(code: str, pk: int):
 __all__ = (
     'get_menu_items',
     'menu_item_list',
+    'menu_item_meta',
     'menu_item_post',
     'menu_item_instance_retrieve',
     'menu_item_instance_put',

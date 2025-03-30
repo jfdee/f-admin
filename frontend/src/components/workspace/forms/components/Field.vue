@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import BoolField from "./BoolField.vue";
+  import BooleanField from "./BooleanField.vue";
   import DateField from "./DateField.vue";
   import DateTimeField from "./DateTimeField.vue";
   import TextField from "./TextField.vue";
@@ -26,7 +26,7 @@
       component() {
         switch (this.meta.type) {
           case 'bool':
-            return BoolField
+            return BooleanField
           case 'int':
             return NumberField
           case 'date':

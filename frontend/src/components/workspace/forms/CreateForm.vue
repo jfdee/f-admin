@@ -1,7 +1,8 @@
 <template>
   <el-dialog style="padding-top: 24px" center :model-value="show" @close="onClose">
+    <slot name="alert" />
     <el-form ref="form" :model="item" :rules="rules" label-position="left" label-width="auto">
-      <el-form-item v-for="field in writeFields" :key="field.name" :label="field.label" :prop="field.name">
+      <el-form-item v-for="field in fields" :key="field.name" :label="field.label" :prop="field.name">
         <Field v-model="item[field.name]" :meta="field"/>
       </el-form-item>
     </el-form>
@@ -14,52 +15,73 @@
 </template>
 
 <script>
-  import Field from './components/Field.vue'
+  import Field from '@/components/write-fields/Field.vue'
   export default {
     name: 'CreateForm',
     components: {Field},
+    emits: ['close', 'submit-success'],
     props: {
-      show: {
-        type: Boolean,
+      apiPath: {
+        type: String,
         required: true,
       },
-      fields: {
-        type: Array,
-        required: true,
+      edit: {
+        type: Boolean,
+        default: false,
       },
     },
     data() {
       return {
+        show: false,
         item: {},
+        fields: [],
+        rules: {},
       }
     },
-    computed: {
-      writeFields() {
-        return this.fields.filter(item => !item.read_only)
-      },
-      rules() {
-        let rules = {}
-        this.writeFields.forEach(item => {
-          rules[item.name] = [{required: item.required, message: 'Value required', trigger: 'blur'}]
-        })
-        return rules
-      },
+    async created() {
+      if (this.edit) return
+      await this.load()
+      this.setRules()
+      this.show = true
     },
     mounted() {
-      this.writeFields.forEach(item => {
-        this.item[item.name] = null
-      })
+      if (this.edit) {
+        this.show = true
+      }
     },
     methods: {
+      async load() {
+        return this.$ajax.get(`${this.apiPath}meta`).then(({data}) => {
+          this.fields = data.fields
+        })
+      },
+      setRules() {
+        const rules = {}
+        this.fields.forEach(item => {
+          if (!item.required) return
+          rules[item.name] = [{required: item.required}]
+        })
+        this.rules = rules
+      },
       onSubmit() {
-        this.$refs.form.validate((valid) => {
+        this.$refs.form.validate(valid => {
           if (!valid) return
-          this.$emit('submit', this.item)
-          this.item = {}
+          if (this.edit) {
+            this.$emit('submit-success', this.item)
+            return
+          }
+          this.$ajax.post(this.apiPath, this.item).then(() => {
+            this.item = {}
+            this.$emit('submit-success')
+          })
         })
       },
       onClose() {
-        this.$refs.form.resetFields()
+        this.show = false
+        this.item = {}
+        this.fields = []
+        this.rules = {}
+        this.$emit('close')
       }
     },
   }

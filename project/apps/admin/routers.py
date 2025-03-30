@@ -35,6 +35,13 @@ menu_item_router.add_api_route(
     status_code=status.HTTP_200_OK,
 )
 menu_item_router.add_api_route(
+    methods=['GET'],
+    path='/meta',
+    endpoint=endpoints.menu_item_meta,
+    response_model=dict,
+    status_code=status.HTTP_200_OK,
+)
+menu_item_router.add_api_route(
     methods=['POST'],
     path='/',
     endpoint=endpoints.menu_item_post,
