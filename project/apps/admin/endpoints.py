@@ -66,14 +66,12 @@ async def to_internal_value(model, data: dict):
     """json -> object"""
     _data = {}
     for key, value in data.items():
-        if not value:
-            _data[key] = value
-            continue
+        # TODO(разобраться с наличием value и default полей)
         f_meta = model._meta.fields_map[key]
         f_type = f_meta.field_type.__name__
-        if f_type == 'datetime':
+        if f_type == 'datetime' and value:
             value = datetime.strptime(value, DATETIME_FORMAT)
-        if f_type == 'date':
+        if f_type == 'date' and value:
             value = datetime.strptime(value, DATE_FORMAT).date()
         if f_type == 'bool' and value is None:
             value = f_meta.default
@@ -86,6 +84,7 @@ async def to_internal_value(model, data: dict):
 
 
 async def get_fields_meta(model) -> list:
+    # TODO(получать мету при открытыи модалки создания/редактирования)
     fields = []
     for f_name, f_meta in model._meta.fields_map.items():
         if not f_meta.field_type:
@@ -119,7 +118,7 @@ async def get_paginator(model):
     return {'count': await model.all().count()}
 
 
-async def menu_item_list(code: str, page: int):
+async def menu_item_list(code: str, page: int, search: str = None):
     model = _get_model(code)
     limit = 10
     offset = (page - 1) * limit
