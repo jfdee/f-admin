@@ -3,7 +3,7 @@
     <el-alert v-if="alert" class="mb-4" :title="alert" :closable="false" type="error" />
     <el-form ref="form" :model="item" :rules="rules" label-position="left" label-width="auto">
       <el-form-item v-for="field in fields" :key="field.name" :label="field.label" :prop="field.name">
-        <Field v-model="item[field.name]" :meta="field" />
+        <Field v-model="item[field.name]" :meta="field"/>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -19,6 +19,7 @@
   export default {
     name: 'CreateForm',
     components: {Field},
+    emits: ['close', 'submit-success'],
     props: {
       apiPath: {
         type: String,
@@ -29,7 +30,6 @@
         default: false,
       },
     },
-    emits: ['close', 'submit-success'],
     data() {
       return {
         show: false,
