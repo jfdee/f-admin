@@ -5,7 +5,7 @@
       {{ selectedItem.label }}
     </el-header>
     <el-main>
-      <el-row justify="space-between" style="margin-bottom: 12px; width: 100%">
+      <el-row class="mb-4" justify="space-between" style="width: 100%">
         <el-pagination layout="prev, pager, next" background :total="count" @current-change="onChangePage" />
         <el-input v-model="search" style="width: 600px" placeholder="Search" />
         <el-button style="width: 130px" title="Create" icon="plus" @click="onCreate" />
@@ -29,7 +29,7 @@
       </el-table>
     </el-main>
     <CreateForm v-if="showCreateForm" :api-path="apiPath" @close="onCreateClose" @submit-success="onCreateSuccess" />
-    <EditForm v-if="showEditForm" :api-path="apiPath" :row="selectedRow" @close="onEditClose" @submit-success-edit="onEditSuccess" />
+    <EditForm v-if="showEditForm" :api-path="apiPath" :row="selectedRow" @close="onEditClose" @submit-success="onEditSuccess" />
   </el-container>
 </template>
 

@@ -33,7 +33,7 @@
             return DateField
           case 'datetime':
             return DateTimeField
-          case 'foreign_key':
+          case 'select':
             return SelectField
           default:
             return TextField

@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'ForeignKeyField',
+    name: 'SelectField',
     props: {
       meta: {
         type: Object,

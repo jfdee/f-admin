@@ -1,9 +1,5 @@
 <template>
-  <CreateForm v-if="show" ref="form" :api-path="apiPath" :edit="true" @close="$emit('close')" @submit-success="onSubmitSuccess">
-    <template #alert>
-      <el-alert v-if="alert" style="margin-bottom: 16px" :title="alert" :closable="false" type="error" />
-    </template>
-  </CreateForm>
+  <CreateForm v-if="show" ref="form" :api-path="apiPath" :edit="true" @close="$emit('close')" @submit-success="onSubmitSuccess" />
 </template>
 
 <script>
@@ -11,7 +7,7 @@
   export default {
     name: 'EditForm',
     components: {CreateForm},
-    emits: ['close', 'submit-success-edit'],
+    emits: ['close', 'submit-success'],
     props: {
       apiPath: {
         type: String,
@@ -25,7 +21,6 @@
     data() {
       return {
         show: false,
-        alert: null,
       }
     },
     created() {
@@ -46,10 +41,10 @@
       },
       onSubmitSuccess(data) {
         this.$ajax.put(`${this.apiPath}${this.row.id}/`, data).then(() => {
-          this.$emit('submit-success-edit')
+          this.$emit('submit-success')
         }).catch(e => {
           console.log(e)
-          this.alert = e.message
+          this.$refs.form.alert = e.message
         })
       },
     },

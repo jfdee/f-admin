@@ -1,6 +1,6 @@
 <template>
   <el-dialog style="padding-top: 24px" center :model-value="show" @close="onClose">
-    <slot name="alert" />
+    <el-alert v-if="alert" class="mb-4" :title="alert" :closable="false" type="error" />
     <el-form ref="form" :model="item" :rules="rules" label-position="left" label-width="auto">
       <el-form-item v-for="field in fields" :key="field.name" :label="field.label" :prop="field.name">
         <Field v-model="item[field.name]" :meta="field"/>
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  import Field from '@/components/write-fields/Field.vue'
+  import Field from './components/Field.vue'
   export default {
     name: 'CreateForm',
     components: {Field},
@@ -36,6 +36,7 @@
         item: {},
         fields: [],
         rules: {},
+        alert: null,
       }
     },
     async created() {
@@ -73,6 +74,9 @@
           this.$ajax.post(this.apiPath, this.item).then(() => {
             this.item = {}
             this.$emit('submit-success')
+          }).catch(e => {
+            console.log(e.message)
+            this.alert = e.message
           })
         })
       },
