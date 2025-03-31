@@ -1,5 +1,12 @@
 <template>
-  <CreateForm v-if="show" ref="form" :api-path="apiPath" :edit="true" @close="$emit('close')" @submit-success="onSubmitSuccess" />
+  <CreateForm
+    v-if="show"
+    ref="form"
+    :api-path="apiPath"
+    :edit="true"
+    @close="$emit('close')"
+    @submit-success="onSubmitSuccess"
+  />
 </template>
 
 <script>
@@ -7,7 +14,6 @@
   export default {
     name: 'EditForm',
     components: {CreateForm},
-    emits: ['close', 'submit-success'],
     props: {
       apiPath: {
         type: String,
@@ -18,6 +24,7 @@
         default: null,
       },
     },
+    emits: ['close', 'submit-success'],
     data() {
       return {
         show: false,
