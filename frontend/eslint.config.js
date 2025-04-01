@@ -5,7 +5,8 @@ export default [
     {
         rules: {
             'vue/singleline-html-element-content-newline': 'off',
-            "vue/max-attributes-per-line": ['error', {
+            'vue/multi-word-component-names': 'off',
+            'vue/max-attributes-per-line': ['error', {
                 'singleline': {'max': 5},
                 'multiline': {'max': 1},
             }],

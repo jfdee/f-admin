@@ -10,7 +10,7 @@
 </template>
 
 <script>
-  import CreateForm from "./CreateForm.vue";
+  import CreateForm from './CreateForm.vue'
   export default {
     name: 'EditForm',
     components: {CreateForm},

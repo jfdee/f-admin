@@ -1,12 +1,12 @@
 export default [
   {
     path: 'admin',
-    name: 'components-admin-view',
-    component: () => import ('./View.vue'),
+    name: 'admin-components-page',
+    component: () => import ('./Page.vue'),
     children: [
       {
         path: ':code',
-        name: 'components-admin-menu-item-view',
+        name: 'admin-components-workspace-view',
         component: () => import('./workspace/View.vue'),
       },
     ],

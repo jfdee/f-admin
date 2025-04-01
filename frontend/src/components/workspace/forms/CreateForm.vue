@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  import Field from './components/Field.vue'
+  import Field from './fields/Field.vue'
   export default {
     name: 'CreateForm',
     components: {Field},
@@ -52,9 +52,9 @@
     },
     methods: {
       async load() {
-        return this.$ajax.get(`${this.apiPath}meta`).then(({data}) => {
-          this.fields = data.fields
-        })
+        const promise = this.$ajax.get(`${this.apiPath}meta`)
+        promise.then(({data}) => {this.fields = data.fields})
+        return promise
       },
       setRules() {
         const rules = {}

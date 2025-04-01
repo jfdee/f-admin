@@ -3,12 +3,12 @@
 </template>
 
 <script>
-  import BooleanField from "./BooleanField.vue";
-  import DateField from "./DateField.vue";
-  import DateTimeField from "./DateTimeField.vue";
-  import TextField from "./TextField.vue";
-  import NumberField from "./NumberField.vue";
-  import SelectField from "./SelectField.vue";
+  import BooleanField from './BooleanField.vue'
+  import DateField from './DateField.vue'
+  import DateTimeField from './DateTimeField.vue'
+  import TextField from './TextField.vue'
+  import NumberField from './NumberField.vue'
+  import SelectField from './SelectField.vue'
   export default {
     name: 'FieldView',
     props: {

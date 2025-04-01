@@ -12,7 +12,7 @@
   </el-menu>
 </template>
 <script>
-  import MenuStoreMixin from '@/components/MenuStoreMixin'
+  import MenuStoreMixin from '@/components/common/MenuStoreMixin'
   export default {
     name: 'NavigationView',
     mixins: [MenuStoreMixin],
@@ -27,7 +27,7 @@
       },
       onSelectItem(item) {
         this.menuStore.setSelected(item.code)
-        this.$router.push({name: 'components-admin-menu-item-view', params: {code: item.code}})
+        this.$router.push({name: 'admin-components-workspace-view', params: {code: item.code}})
       },
     },
   }
