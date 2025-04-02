@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from apps.admin.routers import router as admin_router
+from f_admin_backend.routers import router as admin_router
 
 router = APIRouter(prefix='/api', tags=['api'])
 router.include_router(admin_router)
