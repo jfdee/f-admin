@@ -92,14 +92,14 @@ async def get_list_meta_fields(model):
         if not f_meta.field_type:
             # backward relation
             continue
-        if f_meta.allows_generated and f_meta.source_field:
-            # fk field_id
-            continue
         field_meta = {
             'name': f_name,
             'label': f_meta.description or f_name,
             'type': f_meta.field_type.__name__,
         }
+        if f_meta.allows_generated and f_meta.source_field:
+            # fk field_id
+            field_meta['type'] = 'related_id'
         if getattr(f_meta, 'related_model', None):
             field_meta['type'] = 'related'
         fields.append(field_meta)
@@ -142,7 +142,7 @@ async def get_object_meta_fields(model):
         }
         if getattr(f_meta, 'related_model', None):
             related_queryset = await f_meta.related_model.all()
-            field_meta['type'] = 'select'
+            field_meta['type'] = 'related'
             field_meta['choices'] = [(x.id, str(x)) for x in related_queryset]
         fields.append(field_meta)
     return fields

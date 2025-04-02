@@ -5,6 +5,7 @@
       <el-input v-model="search" style="width: 600px" placeholder="Search" />
       <el-button style="width: 130px" title="Create" icon="plus" @click="onCreate" />
     </el-row>
+    <el-alert v-if="alert" class="mb-4" :title="alert" :closable="false" type="error" />
     <el-table
       v-show="isLoaded"
       :data="data"
@@ -70,6 +71,7 @@
         count: 0,
         search: null,
         isLoaded: false,
+        alert: null,
       }
     },
     watch: {
@@ -88,10 +90,12 @@
         this.isLoaded = false
         this.$ajax.get(this.apiPath, {params}).then(({data}) => {
           this.data = data.data
-          this.fields = data.meta.fields
+          this.fields = data.meta.fields.filter(item => item.type !== 'related_id')
           this.count = data.meta.paginator.count
           this.isLoaded = true
           this.$emit('loaded')
+        }).catch(e => {
+          this.alert = e.message
         })
       },
       onCreate() {

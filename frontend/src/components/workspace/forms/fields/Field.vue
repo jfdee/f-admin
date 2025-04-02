@@ -33,7 +33,7 @@
             return DateField
           case 'datetime':
             return DateTimeField
-          case 'select':
+          case 'related':
             return SelectField
           default:
             return TextField
