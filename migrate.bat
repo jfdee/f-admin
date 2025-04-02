@@ -1,7 +1,9 @@
-echo off
+@echo off
 
-cd project
+CD project
+
 if not exist pyproject.toml (
+    echo "init config..."
     aerich init -t app.TORTOISE_CONFIG
 )
 
